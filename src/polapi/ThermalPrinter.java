@@ -71,17 +71,30 @@ public class ThermalPrinter {
 			System.out.println("Printer: start config");
 			
 			try {
-				sleep(2000);		// some time serial not yet configured
+				sleep(1000);		// some time serial not yet configured
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
 			serial.write((char) 0x0A);
 			
+			try {
+				sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
 			for (int i = 0; i < sequence.length; i++) {
 				serial.write(sequence[i]);
 			}
-
+			
+			try {
+				sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			serial.write((char) 0x0A);
 			serial.write("Point, shoot, enjoy!");
 			serial.write((char) 0x0A);
 			serial.write((char) 0x0A);
@@ -110,8 +123,6 @@ public class ThermalPrinter {
 
 		@Override
 		public void run () {
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
-//			String dateString = sdf.format(new Date());
 			byte[] printLineCommand ;
 
 			System.out.println("Printer: start print bitmap");
@@ -169,9 +180,7 @@ public class ThermalPrinter {
 			serial.write((char) 0x0A);
 			serial.write((char) 0x0A);
 
-			System.out.println("Printer: end bitmap");
-
-
+			System.out.println("Printer: end bitmap\n");
 		}
 
 

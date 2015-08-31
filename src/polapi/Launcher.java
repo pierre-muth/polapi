@@ -1,5 +1,8 @@
 package polapi;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
@@ -15,6 +18,8 @@ public class Launcher {
 	GpioPinDigitalInput printButton;
 	GpioPinDigitalInput printerMotor;
 	Camera picam;
+	MonochromImage monochromImage;
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 
 	public Launcher () {
 		//init button and Printer motor input
@@ -39,7 +44,7 @@ public class Launcher {
 		picam = new Camera();
 		new Thread(picam).start();
 		
-
+		monochromImage = new MonochromImage();
 	}
 
 	public static void main(String[] args) {
@@ -54,11 +59,11 @@ public class Launcher {
 			if (event.getState().isLow()) return;
 			System.out.println("Print button pressed !");
 			
-			if (printer != null) {
-				printer.printImage(picam.getAFrame(), picam.S_HEIGHT, picam.S_WIDTH);
+			if (printer != null && !printer.isPrinting() && monochromImage != null ) {
+				monochromImage.setPixels(picam.getAFrame());
+				printer.printImage(monochromImage.getDitheredMonochrom(), Camera.IMG_HEIGHT, Camera.IMG_WIDTH);
+				monochromImage.writeToFile();
 			}
-
-
 		}
 	}
 	
