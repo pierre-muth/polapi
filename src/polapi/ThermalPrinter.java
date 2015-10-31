@@ -1,5 +1,9 @@
 package polapi;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -9,6 +13,8 @@ import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 
 public class ThermalPrinter {
+	public static String HEADER = " ";
+	public static final String HEADERPATH = "/home/pi/polapi/header.txt";
 	static final byte ESC = 27;
 	static final byte _7 = 55;
 	static final byte DC2 = 18;
@@ -18,6 +24,12 @@ public class ThermalPrinter {
 	private PrinterConfig printerConfig;
 
 	public ThermalPrinter() {
+		try (BufferedReader br = new BufferedReader( new FileReader(HEADERPATH))){
+			HEADER = br.readLine();
+		} catch (IOException e) {
+			e.printStackTrace();
+		};
+		HEADER.concat(" ");
 		serial = SerialFactory.createInstance();
 		serial.open(Serial.DEFAULT_COM_PORT, 115200);
 	}
@@ -173,10 +185,10 @@ public class ThermalPrinter {
 				e.printStackTrace();
 			}
 
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-			String date = sdf.format(new Date());
-
-			serial.write(date+"\n");
+//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+//			String date = sdf.format(new Date());
+			
+			serial.write(HEADER+"\n");
 			serial.write((char) 0x0A);
 			serial.write((char) 0x0A);
 

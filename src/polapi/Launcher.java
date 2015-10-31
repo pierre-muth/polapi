@@ -3,6 +3,11 @@ package polapi;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
@@ -11,7 +16,7 @@ import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
-public class Launcher {
+public class Launcher extends Application{
 	ThermalPrinter printer;
 	String fileToPrint;
 	GpioController gpio;
@@ -33,7 +38,7 @@ public class Launcher {
 
 		PrinterConfig pc = new PrinterConfig();
 		pc.heatingMaxDot = 11;
-		pc.heatTime = (byte) 60;
+		pc.heatTime = (byte) 70;
 		pc.heatInterval = (byte) 250;
 		pc.printDensity = 0;
 		pc.printBreakTime = 0;
@@ -48,7 +53,8 @@ public class Launcher {
 	}
 
 	public static void main(String[] args) {
-		System.out.println("Pi-Print Test");
+		System.out.println("PolaPi starting...");
+		launch();
 		new Launcher();
 	}
 
@@ -73,6 +79,15 @@ public class Launcher {
 			//got a new printed line
 			printer.motorStep();
 		}
+	}
+
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		VBox vbox = new VBox();
+		vbox.setStyle("-fx-background-color: black");
+		Scene scene = new Scene(vbox, 320, 240);
+		primaryStage.setScene(scene);
+		primaryStage.show();	
 	}
 
 }

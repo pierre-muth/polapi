@@ -78,7 +78,7 @@ public class MonochromImage {
 			if (notRight) pixDest[pixCount+1] += 7*error/16;
 			if (notLeft && notBottom) pixDest[pixCount+(WIDTH-1)] += 3*error/16;
 			if (notBottom) pixDest[pixCount+(WIDTH)] += 5*error/16;
-			if (notRight && notBottom) pixDest[pixCount+(WIDTH+1)] += 3*error/16;
+			if (notRight && notBottom) pixDest[pixCount+(WIDTH+1)] += error/16;
 		}
 
 		//generate image with pixel bit in bytes
