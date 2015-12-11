@@ -1,0 +1,6 @@
+WELCOME:
+Welcome to Polapi.
+HEADER:
+Taken the #date !
+SERIAL:
+19200

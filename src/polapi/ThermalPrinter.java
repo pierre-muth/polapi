@@ -27,11 +27,16 @@ public class ThermalPrinter {
 		try (BufferedReader br = new BufferedReader( new FileReader(HEADERPATH))){
 			HEADER = br.readLine();
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println("header.txt not found, using config.txt");
 		};
 		HEADER.concat(" ");
+		
 		serial = SerialFactory.createInstance();
-		serial.open(Serial.DEFAULT_COM_PORT, 115200);
+		int baudRate = 115200;
+		baudRate = Launcher.serialSpeed == 19200 ? 19200 : 115200;
+		System.out.println("Opening Serial at "+baudRate+" bauds.");
+		serial.open(Serial.DEFAULT_COM_PORT, baudRate);
+		
 	}
 
 	public void configPrinterWithDefault() {
@@ -107,7 +112,7 @@ public class ThermalPrinter {
 			}
 			
 			serial.write((char) 0x0A);
-			serial.write("Point, shoot, enjoy!");
+			serial.write(Launcher.welcome);
 			serial.write((char) 0x0A);
 			serial.write((char) 0x0A);
 			serial.write((char) 0x0A);
@@ -185,10 +190,13 @@ public class ThermalPrinter {
 				e.printStackTrace();
 			}
 
-//			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
-//			String date = sdf.format(new Date());
-			
-			serial.write(HEADER+"\n");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
+			String date = sdf.format(new Date());
+			if (Launcher.header != " ") {
+				serial.write(Launcher.header.replace(Launcher.DATEKEY, date)+"\n");
+			} else {
+				serial.write(HEADER+"\n");
+			}
 			serial.write((char) 0x0A);
 			serial.write((char) 0x0A);
 
