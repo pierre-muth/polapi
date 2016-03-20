@@ -167,7 +167,8 @@ public class ThermalPrinter {
 					serial.write(imageByte);
 				}
 
-//				System.out.println("Line sent: "+lineSent+", linePrinted: "+linePrinted.get());
+				if (Launcher.debugOutput)
+					System.out.println("Line sent: "+lineSent+", linePrinted: "+linePrinted.get());
 
 				if (lineSent > 50) {
 					

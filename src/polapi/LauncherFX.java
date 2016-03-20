@@ -4,6 +4,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -13,49 +19,41 @@ import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
-public class Launcher {
-	private ThermalPrinter printer;
-	private String fileToPrint;
-	private GpioController gpio;
-	private GpioPinDigitalInput printButton;
-	private GpioPinDigitalInput printerMotor;
-	private Camera picam;
-	private MonochromImage monochromImage;
-	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
+public class LauncherFX extends Application{
+	ThermalPrinter printer;
+	String fileToPrint;
+	GpioController gpio;
+	GpioPinDigitalInput printButton;
+	GpioPinDigitalInput printerMotor;
+	Camera picam;
+	MonochromImage monochromImage;
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
 	
 	private static final String CONFPATH = "/home/pi/polapi/config.txt";
 	private static final String HEADERKEY = "HEADER:";
 	private static final String WELCOMEKEY = "WELCOME:";
 	private static final String SERIALKEY = "SERIAL:";
-	private static final String DEBUGKEY = "DEBUG:";
 	public static final String DATEKEY = "#date";
 	public static String header = "";
 	public static String welcome = "";
 	public static int serialSpeed = 0;
-	public static boolean debugOutput = false;
 
-	public Launcher () {
+	public LauncherFX () {
 		//get some config
 		String line;
 		try (BufferedReader br = new BufferedReader( new FileReader(CONFPATH))){
-			
 			line = br.readLine();
-			if (line != null && line.contains(WELCOMEKEY)) {
+			if (line.contains(WELCOMEKEY)) {
 				welcome = br.readLine();
 			}
 			line = br.readLine();
-			if (line != null && line.contains(HEADERKEY)) {
+			if (line.contains(HEADERKEY)) {
 				header = br.readLine();
 			}
 			line = br.readLine();
-			if (line != null && line.contains(SERIALKEY)) {
+			if (line.contains(SERIALKEY)) {
 				serialSpeed = Integer.parseInt( br.readLine() );
 			}
-			line = br.readLine();
-			if (line != null && line.contains(DEBUGKEY)) {
-				debugOutput = Integer.parseInt( br.readLine() ) == 1; 
-			}
-			
 		} catch (IOException e) {
 			System.out.println("Error in config.txt");
 		};
@@ -89,7 +87,8 @@ public class Launcher {
 
 	public static void main(String[] args) {
 		System.out.println("PolaPi starting...");
-		new Launcher();
+		launch();
+		new LauncherFX();
 	}
 
 
@@ -123,6 +122,15 @@ public class Launcher {
 			//got a new printed line
 			printer.motorStep();
 		}
+	}
+
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		VBox vbox = new VBox();
+		vbox.setStyle("-fx-background-color: black");
+		Scene scene = new Scene(vbox, 320, 240);
+		primaryStage.setScene(scene);
+		primaryStage.show();	
 	}
 
 }
