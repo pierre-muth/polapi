@@ -28,12 +28,20 @@ public class Launcher {
 	private static final String WELCOMEKEY = "WELCOME:";
 	private static final String SERIALKEY = "SERIAL:";
 	private static final String BUFFERKEY = "BUFFER:";
+	private static final String DELAYKEY = "DELAY:";
+	private static final String HEATINGMAXDOTKEY = "HEATINGMAXDOT:";
+	private static final String HEATTIMEKEY = "HEATTIME:";
+	private static final String HEATINTERVALKEY = "HEATINTERVAL:";
 	private static final String DEBUGKEY = "DEBUG:";
 	public static final String DATEKEY = "#date";
 	public static String header = "";
 	public static String welcome = "";
 	public static int serialSpeed = 0;
 	public static int printerBuffer = 80;
+	public static int dataDelay = 2;
+	public static int heatingMaxDot = 11;
+	public static int heatTime = 70;
+	public static int heatInterval = 250;
 	public static boolean debugOutput = false;
 
 	public Launcher () {
@@ -58,6 +66,22 @@ public class Launcher {
 				printerBuffer = Integer.parseInt( br.readLine() );
 			}
 			line = br.readLine();
+			if (line != null && line.contains(DELAYKEY)) {
+				dataDelay = Integer.parseInt( br.readLine() );
+			}
+			line = br.readLine();
+			if (line != null && line.contains(HEATINGMAXDOTKEY)) {
+				heatingMaxDot = Integer.parseInt( br.readLine() );
+			}
+			line = br.readLine();
+			if (line != null && line.contains(HEATTIMEKEY)) {
+				heatTime = Integer.parseInt( br.readLine() );
+			}
+			line = br.readLine();
+			if (line != null && line.contains(HEATINTERVALKEY)) {
+				heatInterval = Integer.parseInt( br.readLine() );
+			}
+			line = br.readLine();
 			if (line != null && line.contains(DEBUGKEY)) {
 				debugOutput = Integer.parseInt( br.readLine() ) == 1; 
 			}
@@ -78,9 +102,9 @@ public class Launcher {
 		printerMotor.addListener(new MotorListener());
 
 		PrinterConfig pc = new PrinterConfig();
-		pc.heatingMaxDot = 11;
-		pc.heatTime = (byte) 70;
-		pc.heatInterval = (byte) 250;
+		pc.heatingMaxDot = (byte) heatingMaxDot;
+		pc.heatTime = (byte) heatTime;
+		pc.heatInterval = (byte) heatInterval;
 		pc.printDensity = 0;
 		pc.printBreakTime = 0;
 
