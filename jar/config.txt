@@ -4,5 +4,7 @@ HEADER:
 Taken the #date !
 SERIAL:
 115200
+BUFFER:
+80
 DEBUG:
 1

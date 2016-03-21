@@ -27,11 +27,13 @@ public class Launcher {
 	private static final String HEADERKEY = "HEADER:";
 	private static final String WELCOMEKEY = "WELCOME:";
 	private static final String SERIALKEY = "SERIAL:";
+	private static final String BUFFERKEY = "BUFFER:";
 	private static final String DEBUGKEY = "DEBUG:";
 	public static final String DATEKEY = "#date";
 	public static String header = "";
 	public static String welcome = "";
 	public static int serialSpeed = 0;
+	public static int printerBuffer = 80;
 	public static boolean debugOutput = false;
 
 	public Launcher () {
@@ -50,6 +52,10 @@ public class Launcher {
 			line = br.readLine();
 			if (line != null && line.contains(SERIALKEY)) {
 				serialSpeed = Integer.parseInt( br.readLine() );
+			}
+			line = br.readLine();
+			if (line != null && line.contains(BUFFERKEY)) {
+				printerBuffer = Integer.parseInt( br.readLine() );
 			}
 			line = br.readLine();
 			if (line != null && line.contains(DEBUGKEY)) {

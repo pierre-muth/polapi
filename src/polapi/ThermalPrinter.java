@@ -27,7 +27,7 @@ public class ThermalPrinter {
 		try (BufferedReader br = new BufferedReader( new FileReader(HEADERPATH))){
 			HEADER = br.readLine();
 		} catch (IOException e) {
-			System.out.println("header.txt not found, using config.txt");
+//			System.out.println("header.txt not found, using config.txt");
 		};
 		HEADER.concat(" ");
 		
@@ -173,7 +173,7 @@ public class ThermalPrinter {
 				if (lineSent > 50) {
 					
 					int i=0;
-					while ( (lineSent - linePrinted.get()) > 80 && i < 20) {
+					while ( (lineSent - linePrinted.get()) > Launcher.printerBuffer && i < 20) {
 						try { 
 							sleep(1);	
 							i++;
