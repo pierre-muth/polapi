@@ -33,6 +33,7 @@ public class Launcher {
 	private static final String HEATTIMEKEY = "HEATTIME:";
 	private static final String HEATINTERVALKEY = "HEATINTERVAL:";
 	private static final String DEBUGKEY = "DEBUG:";
+	private static final String CONTINUOUSDELAYKEY = "CONTINUOUSDELAY:";
 	public static final String DATEKEY = "#date";
 	public static String header = "";
 	public static String welcome = "";
@@ -43,7 +44,8 @@ public class Launcher {
 	public static int heatTime = 70;
 	public static int heatInterval = 250;
 	public static boolean debugOutput = false;
-
+	public static int continuousDelay = 15;
+	
 	public Launcher () {
 		//get some config
 		String line;
@@ -82,6 +84,10 @@ public class Launcher {
 				heatInterval = Integer.parseInt( br.readLine() );
 			}
 			line = br.readLine();
+			if (line != null && line.contains(CONTINUOUSDELAYKEY)) {
+				continuousDelay = Integer.parseInt( br.readLine() );
+			}
+			line = br.readLine();
 			if (line != null && line.contains(DEBUGKEY)) {
 				debugOutput = Integer.parseInt( br.readLine() ) == 1; 
 			}
@@ -116,12 +122,39 @@ public class Launcher {
 		
 		monochromImage = new MonochromImage();
 	}
+	
+	private void print(){
+		if (printer != null && !printer.isPrinting() && monochromImage != null ) { // reject if yet printing
+			monochromImage.setPixels(picam.getAFrame());
+			printer.printImage(monochromImage.getDitheredMonochrom(), Camera.IMG_HEIGHT, Camera.IMG_WIDTH);
+			monochromImage.writeToFile();
+		}
+	}
 
 	public static void main(String[] args) {
 		System.out.println("PolaPi starting...");
 		new Launcher();
 	}
 
+	private class PrintManager extends Thread {
+		
+		@Override
+		public void run () {
+
+			while (printButton.isHigh()) {
+				
+				print();
+				
+				try {
+					sleep(continuousDelay *1000);		
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				
+			}
+			
+		}
+	}
 
 	class ButtonListener implements GpioPinListenerDigital {
 		long lastPrintTime;
@@ -139,11 +172,8 @@ public class Launcher {
 			if ( currentTime - lastPrintTime < 500 ) return; // reject if less than 500 ms
 			
 			lastPrintTime = currentTime;
-			if (printer != null && !printer.isPrinting() && monochromImage != null ) { // reject if yet printing
-				monochromImage.setPixels(picam.getAFrame());
-				printer.printImage(monochromImage.getDitheredMonochrom(), Camera.IMG_HEIGHT, Camera.IMG_WIDTH);
-				monochromImage.writeToFile();
-			}
+			PrintManager pm = new PrintManager();
+			pm.start();
 		}
 	}
 	
