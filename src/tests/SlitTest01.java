@@ -86,13 +86,16 @@ public class SlitTest01 extends JPanel {
 		private int errorPointer = 0;
 		@Override
 		public void run() {
-			Rectangle screenRectangle = new Rectangle(
-					MouseInfo.getPointerInfo().getLocation().x, MouseInfo.getPointerInfo().getLocation().y - (HEIGHT/2),
-					1, HEIGHT);
+			// capture a vertical pixel line around mouse pointer 
+			Rectangle screenRectangle = new Rectangle(MouseInfo.getPointerInfo().getLocation().x, 
+					MouseInfo.getPointerInfo().getLocation().y - (HEIGHT/2), 1, HEIGHT);
 			final BufferedImage sourceImage = robot.createScreenCapture(screenRectangle);
-			final BufferedImage stackImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_BYTE_GRAY); 
 			
+			// get the pixel line data
 			sourceImage.getData().getPixels(0, 0, 1, HEIGHT, verticalLineRGBList);
+
+			// generate image buffer 
+			final BufferedImage stackImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_BYTE_GRAY); 
 			
 			// RGB to gray
 			for (int i = 0; i < HEIGHT ; i++) {
@@ -109,6 +112,8 @@ public class SlitTest01 extends JPanel {
 	        	if (error < -127) error = -127;
 	        	if (error > 127) error = 127;
 				
+	        	verticalLineErrorList[(errorPointer+HEIGHT)%(verticalLineErrorList.length)] += 5*error/16;
+
 	        	if (i != 0) {
 	        		verticalLineErrorList[(errorPointer+HEIGHT-1)%(verticalLineErrorList.length)] += 3*error/16;
 	        	} 
@@ -117,13 +122,11 @@ public class SlitTest01 extends JPanel {
 	        		verticalLineErrorList[(errorPointer+HEIGHT+1)%(verticalLineErrorList.length)] = error/16;
 	        	} 
 	        	
-	        	verticalLineErrorList[(errorPointer+HEIGHT)%(verticalLineErrorList.length)] += 5*error/16;
-	        	
 	        	errorPointer++;
 	        	errorPointer %= verticalLineErrorList.length;
 			}
 			
-			// shift by one column to left
+			// shift image by one column to the left
 			int x, y;
 			for (int i = 0; i < pixList.length; i++) {
 				x = i%WIDTH;
@@ -133,16 +136,17 @@ public class SlitTest01 extends JPanel {
 				}
 			}
 			
-			// add column
+			// add computed column on the left
 			for (int i = 0; i < HEIGHT ; i++) {
 				pixList[(WIDTH-1) + ((i)*WIDTH)] = verticalLineGrayList[i];
 			}
 	        
+			// make the image
 			WritableRaster wr = stackImage.getData().createCompatibleWritableRaster();
 			wr.setPixels(0, 0, WIDTH, HEIGHT, pixList);
-
 			stackImage.setData(wr);
 
+			// update image label in Swing Thread
 			javax.swing.SwingUtilities.invokeLater(new Runnable() {
 				public void run() {
 					labelComputed.setIcon(new ImageIcon(stackImage));

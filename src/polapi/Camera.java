@@ -9,9 +9,9 @@ public class Camera implements Runnable {
 	public static final int IMG_WIDTH = (int) (IMG_HEIGHT * 1.5);	// 2/3 ratio
 	public static final int FPS = 12;	
 	public static final String RASPIVID = 
-			"/opt/vc/bin/raspividyuv"+	//frame rate
-			" -w "+IMG_WIDTH+" -h "+IMG_HEIGHT+			//image dimension
-			" -ex night -fps 0 -ev +0.5 -t 0 -cfx 128:128 -o -";				//no timeout, monochom effect   -ev +0.5
+			"/opt/vc/bin/raspividyuv "+"-w "+IMG_WIDTH+" -h "+IMG_HEIGHT+" -t 0 "+	//image dimension, no timeout
+			Launcher.raspbivid_param+												
+			" -o -";		// std output
 
 
 	private int[] pixBuf = new int[IMG_HEIGHT * IMG_WIDTH ];

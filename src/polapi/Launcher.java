@@ -34,6 +34,7 @@ public class Launcher {
 	private static final String HEATINTERVALKEY = "HEATINTERVAL:";
 	private static final String DEBUGKEY = "DEBUG:";
 	private static final String CONTINUOUSDELAYKEY = "CONTINUOUSDELAY:";
+	private static final String CAMERAPARAMKEY = "RASPIVID:";
 	public static final String DATEKEY = "#date";
 	public static String header = "";
 	public static String welcome = "";
@@ -45,6 +46,7 @@ public class Launcher {
 	public static int heatInterval = 250;
 	public static boolean debugOutput = false;
 	public static int continuousDelay = 15;
+	public static String raspbivid_param = "-ex night -fps 0 -ev +0.5 -cfx 128:128"; //  ev +0.5, monochom effect, ...
 	
 	public Launcher () {
 		//get some config
@@ -86,6 +88,10 @@ public class Launcher {
 			line = br.readLine();
 			if (line != null && line.contains(CONTINUOUSDELAYKEY)) {
 				continuousDelay = Integer.parseInt( br.readLine() );
+			}
+			line = br.readLine();
+			if (line != null && line.contains(CAMERAPARAMKEY)) {
+				raspbivid_param = br.readLine();
 			}
 			line = br.readLine();
 			if (line != null && line.contains(DEBUGKEY)) {
