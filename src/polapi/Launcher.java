@@ -119,10 +119,10 @@ public class Launcher {
 		//init button and Printer motor input
 		gpio = GpioFactory.getInstance();
 		
-		printButton = gpio.provisionDigitalInputPin(RaspiPin.GPIO_04, PinPullResistance.PULL_DOWN);
+		printButton = gpio.provisionDigitalInputPin(RaspiPin.getPinByName(button_pin_name), PinPullResistance.PULL_DOWN);
 		printButton.addListener(new ButtonListener());
 		
-		printerMotor = gpio.provisionDigitalInputPin(RaspiPin.GPIO_03, PinPullResistance.OFF);
+		printerMotor = gpio.provisionDigitalInputPin(RaspiPin.getPinByName(motor_pin_name), PinPullResistance.OFF);
 		printerMotor.addListener(new MotorListener());
 
 		PrinterConfig pc = new PrinterConfig();
