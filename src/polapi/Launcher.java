@@ -35,6 +35,8 @@ public class Launcher {
 	private static final String DEBUGKEY = "DEBUG:";
 	private static final String CONTINUOUSDELAYKEY = "CONTINUOUSDELAY:";
 	private static final String CAMERAPARAMKEY = "RASPIVID:";
+	private static final String BUTTONPINKEY = "BUTTONPIN:";
+	private static final String MOTORPINKEY = "MOTORPIN:";
 	public static final String DATEKEY = "#date";
 	public static String header = "";
 	public static String welcome = "";
@@ -47,6 +49,8 @@ public class Launcher {
 	public static boolean debugOutput = false;
 	public static int continuousDelay = 15;
 	public static String raspbivid_param = "-ex night -fps 0 -ev +0.5 -cfx 128:128"; //  ev +0.5, monochom effect, ...
+	public static String button_pin_name = "GPIO 4";
+	public static String motor_pin_name = "GPIO 3";
 	
 	public Launcher () {
 		//get some config
@@ -92,6 +96,14 @@ public class Launcher {
 			line = br.readLine();
 			if (line != null && line.contains(CAMERAPARAMKEY)) {
 				raspbivid_param = br.readLine();
+			}
+			line = br.readLine();
+			if (line != null && line.contains(BUTTONPINKEY)) {
+				button_pin_name = br.readLine();
+			}
+			line = br.readLine();
+			if (line != null && line.contains(MOTORPINKEY)) {
+				motor_pin_name = br.readLine();
 			}
 			line = br.readLine();
 			if (line != null && line.contains(DEBUGKEY)) {
