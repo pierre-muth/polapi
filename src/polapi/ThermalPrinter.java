@@ -13,8 +13,6 @@ import com.pi4j.io.serial.Serial;
 import com.pi4j.io.serial.SerialFactory;
 
 public class ThermalPrinter {
-	public static String HEADER = " ";
-	public static final String HEADERPATH = "/home/pi/polapi/header.txt";
 	static final byte ESC = 27;
 	static final byte _7 = 55;
 	static final byte DC2 = 18;
@@ -24,12 +22,6 @@ public class ThermalPrinter {
 	private PrinterConfig printerConfig;
 
 	public ThermalPrinter() {
-		try (BufferedReader br = new BufferedReader( new FileReader(HEADERPATH))){
-			HEADER = br.readLine();
-		} catch (IOException e) {
-//			System.out.println("header.txt not found, using config.txt");
-		};
-		HEADER.concat(" ");
 		
 		serial = SerialFactory.createInstance();
 		int baudRate = 115200;
@@ -68,18 +60,24 @@ public class ThermalPrinter {
 
 	private class PrinterConfigThread extends Thread {
 		private PrinterConfig config;
-		private byte[] sequence;
+		private byte[] configSequence;
+		private byte[] smallFontSelectSequence;
 
 		public PrinterConfigThread(PrinterConfig config) {
 			this.config = config;
 
-			sequence = new byte[] {
+			configSequence = new byte[] {
 					ESC, _7, 
 					config.heatingMaxDot, config.heatTime, config.heatInterval, 
 					DC2, DIEZE,
 					(byte) ((config.printBreakTime << 5) | config.printDensity),
 					0x1D, 0x61, (byte) 0xFF // auto report ?
 			};
+			
+			smallFontSelectSequence = new byte[] {
+					0x1B,  0x74, 0x01
+			};
+			
 		}
 
 		@Override
@@ -96,19 +94,30 @@ public class ThermalPrinter {
 			serial.write((char) 0x0A);
 			
 			try {
-				sleep(500);
+				sleep(300);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 			
-			for (int i = 0; i < sequence.length; i++) {
-				serial.write(sequence[i]);
+			for (int i = 0; i < configSequence.length; i++) {
+				serial.write(configSequence[i]);
 			}
 			
 			try {
-				sleep(500);
+				sleep(300);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			}
+			
+			if ( Launcher.smallFont ) {
+				for (int i = 0; i < smallFontSelectSequence.length; i++) {
+					serial.write(smallFontSelectSequence[i]);
+				}
+				try {
+					sleep(300);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			
 			serial.write((char) 0x0A);
@@ -193,11 +202,11 @@ public class ThermalPrinter {
 
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
 			String date = sdf.format(new Date());
+			
 			if (Launcher.header != " ") {
 				serial.write(Launcher.header.replace(Launcher.DATEKEY, date)+"\n");
-			} else {
-				serial.write(HEADER+"\n");
-			}
+			} 
+			
 			serial.write((char) 0x0A);
 			serial.write((char) 0x0A);
 

@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
+import org.apache.commons.lang3.text.WordUtils;
+
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
@@ -22,7 +24,7 @@ public class Launcher {
 	private Camera picam;
 	private MonochromImage monochromImage;
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd_HH.mm.ss");
-	
+	public static final String HEADERPATH = "/home/pi/polapi/header.txt";
 	private static final String CONFPATH = "/home/pi/polapi/config.txt";
 	private static final String HEADERKEY = "HEADER:";
 	private static final String WELCOMEKEY = "WELCOME:";
@@ -37,6 +39,8 @@ public class Launcher {
 	private static final String CAMERAPARAMKEY = "RASPIVID:";
 	private static final String BUTTONPINKEY = "BUTTONPIN:";
 	private static final String MOTORPINKEY = "MOTORPIN:";
+	private static final String SMALLFONTKEY = "SMALLFONT:";
+	private static final String LINECHARKEY = "LINECHAR:";
 	public static final String DATEKEY = "#date";
 	public static String header = "";
 	public static String welcome = "";
@@ -51,6 +55,9 @@ public class Launcher {
 	public static String raspbivid_param = "-ex night -fps 0 -ev +0.5 -cfx 128:128"; //  ev +0.5, monochom effect, ...
 	public static String button_pin_name = "GPIO 4";
 	public static String motor_pin_name = "GPIO 3";
+	public static boolean smallFont = false;
+	public static int lineChar = 30;
+	public static boolean headerFromFile = false;
 	
 	public Launcher () {
 		//get some config
@@ -106,6 +113,14 @@ public class Launcher {
 				motor_pin_name = br.readLine();
 			}
 			line = br.readLine();
+			if (line != null && line.contains(SMALLFONTKEY)) {
+				smallFont = Integer.parseInt( br.readLine() ) == 1;
+			}
+			line = br.readLine();
+			if (line != null && line.contains(LINECHARKEY)) {
+				lineChar = Integer.parseInt( br.readLine() );
+			}
+			line = br.readLine();
 			if (line != null && line.contains(DEBUGKEY)) {
 				debugOutput = Integer.parseInt( br.readLine() ) == 1; 
 			}
@@ -113,6 +128,28 @@ public class Launcher {
 		} catch (IOException e) {
 			System.out.println("Error in config.txt");
 		};
+		
+		//init header text
+		try (BufferedReader br = new BufferedReader( new FileReader(HEADERPATH))){
+
+			line = br.readLine();
+			String singleLine = new String();
+			
+			while (line != null) {
+				singleLine = singleLine +" "+line;
+				line = br.readLine();
+			}
+			 
+			header = WordUtils.wrap(singleLine, lineChar, ""+(char) 0x0A, true);
+			headerFromFile = true;
+			if (debugOutput) {
+				System.out.println("header.txt found : \n"+header);
+			}
+			
+		} catch (IOException e) {
+			System.out.println(HEADERPATH+" not found, using config.txt for header text");
+		};
+		
 		header.concat(" ");
 		welcome.concat(" ");
 		
