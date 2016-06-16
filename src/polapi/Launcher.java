@@ -14,10 +14,10 @@ import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import com.pi4j.io.serial.Serial;
 
 public class Launcher {
 	private ThermalPrinter printer;
-	private String fileToPrint;
 	private GpioController gpio;
 	private GpioPinDigitalInput printButton;
 	private GpioPinDigitalInput printerMotor;
@@ -28,7 +28,7 @@ public class Launcher {
 	private static final String CONFPATH = "/home/pi/polapi/config.txt";
 	private static final String HEADERKEY = "HEADER:";
 	private static final String WELCOMEKEY = "WELCOME:";
-	private static final String SERIALKEY = "SERIAL:";
+	private static final String SERIALSPEEDKEY = "SERIALSPEED:";
 	private static final String BUFFERKEY = "BUFFER:";
 	private static final String DELAYKEY = "DELAY:";
 	private static final String HEATINGMAXDOTKEY = "HEATINGMAXDOT:";
@@ -39,9 +39,11 @@ public class Launcher {
 	private static final String CAMERAPARAMKEY = "RASPIVID:";
 	private static final String BUTTONPINKEY = "BUTTONPIN:";
 	private static final String MOTORPINKEY = "MOTORPIN:";
+	private static final String SERIALDEVICEKEY = "SERIALPORT:";
 	private static final String SMALLFONTKEY = "SMALLFONT:";
 	private static final String LINECHARKEY = "LINECHAR:";
 	public static final String DATEKEY = "#date";
+	public static final String DEFAULTKEY = "#default";
 	public static String header = "";
 	public static String welcome = "";
 	public static int serialSpeed = 0;
@@ -55,6 +57,7 @@ public class Launcher {
 	public static String raspbivid_param = "-ex night -fps 0 -ev +0.5 -cfx 128:128"; //  ev +0.5, monochom effect, ...
 	public static String button_pin_name = "GPIO 4";
 	public static String motor_pin_name = "GPIO 3";
+	public static String serial_device_name = Serial.DEFAULT_COM_PORT;
 	public static boolean smallFont = false;
 	public static int lineChar = 30;
 	public static boolean headerFromFile = false;
@@ -73,7 +76,7 @@ public class Launcher {
 				header = br.readLine();
 			}
 			line = br.readLine();
-			if (line != null && line.contains(SERIALKEY)) {
+			if (line != null && line.contains(SERIALSPEEDKEY)) {
 				serialSpeed = Integer.parseInt( br.readLine() );
 			}
 			line = br.readLine();
@@ -111,6 +114,10 @@ public class Launcher {
 			line = br.readLine();
 			if (line != null && line.contains(MOTORPINKEY)) {
 				motor_pin_name = br.readLine();
+			}
+			line = br.readLine();
+			if (line != null && line.contains(SERIALDEVICEKEY)) {
+				serial_device_name = br.readLine();
 			}
 			line = br.readLine();
 			if (line != null && line.contains(SMALLFONTKEY)) {

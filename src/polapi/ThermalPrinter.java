@@ -1,9 +1,5 @@
 package polapi;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,12 +18,18 @@ public class ThermalPrinter {
 	private PrinterConfig printerConfig;
 
 	public ThermalPrinter() {
-		
 		serial = SerialFactory.createInstance();
-		int baudRate = 115200;
-		baudRate = Launcher.serialSpeed == 19200 ? 19200 : 115200;
-		System.out.println("Opening Serial at "+baudRate+" bauds.");
-		serial.open(Serial.DEFAULT_COM_PORT, baudRate);
+		
+		String comPort;
+		if (Launcher.serial_device_name.contains(Launcher.DEFAULTKEY)) {
+			comPort = Serial.DEFAULT_COM_PORT;
+		} else {
+			comPort = Launcher.serial_device_name;
+		}
+		
+		System.out.println("Opening "+ comPort+" at "+Launcher.serialSpeed+" bauds.");
+		
+		serial.open(comPort, Launcher.serialSpeed);
 		
 	}
 
